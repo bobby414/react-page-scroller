@@ -45,7 +45,8 @@ export default class ReactPageScroller extends React.Component {
 		containerHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		containerWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		blockScrollUp: PropTypes.bool,
-		blockScrollDown: PropTypes.bool
+		blockScrollDown: PropTypes.bool,
+		delta: PropTypes.number,
 	};
 
 	static defaultProps = {
@@ -54,7 +55,8 @@ export default class ReactPageScroller extends React.Component {
 		containerHeight: DEFAULT_CONTAINER_HEIGHT,
 		containerWidth: DEFAULT_CONTAINER_WIDTH,
 		blockScrollUp: false,
-		blockScrollDown: false
+		blockScrollDown: false,
+		delta: 0,
 	};
 
 	constructor(props) {
@@ -195,9 +197,9 @@ export default class ReactPageScroller extends React.Component {
 	}
 
 	[wheelScroll] = (event) => {
-		if (event.deltaY < 0) {
+		if (event.deltaY < -1 * this.props.delta) {
 			this[scrollWindowUp]();
-		} else {
+		} else if (event.deltaY > this.props.delta){
 			this[scrollWindowDown]();
 		}
 
@@ -205,9 +207,9 @@ export default class ReactPageScroller extends React.Component {
 
 	[touchMove] = (event) => {
 		if (!_.isNull(this[previousTouchMove])) {
-			if (event.touches[0].clientY > this[previousTouchMove]) {
+			if (event.touches[0].clientY > this[previousTouchMove] - this.props.delta) {
 				this[scrollWindowUp]();
-			} else {
+			} else if (event.touches[0].clientY < this[previousTouchMove] + this.props.delta) {
 				this[scrollWindowDown]();
 			}
 		} else {
